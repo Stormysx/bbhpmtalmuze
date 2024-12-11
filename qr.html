@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BBHPMTAL - QR CODE OLUŞTURUCU</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        #qrcode {
+            margin-top: 20px;
+        }
+        #selectionOption {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <select id="selectionOption">
+        <option value="A-1">A-1</option>
+        <option value="A-2">A-2</option>
+        <option value="A-3">A-3</option>
+        <option value="A-4">A-4</option>
+        <option value="A-5">A-5</option>
+        <option value="A-6">A-6</option>
+        <option value="A-7">A-7</option>
+        <option value="A-8">A-8</option>
+        <option value="A-9">A-9</option>
+        <option value="A-10">A-10</option>
+        <option value="A-11">A-11</option>
+        <option value="A-12">A-12</option>
+        <option value="A-13">A-13</option>
+        <option value="A-14">A-14</option>
+        <option value="A-15">A-15</option>
+        <option value="A-16">A-16</option>
+        <option value="A-17">A-17</option>
+        <option value="A-18">A-18</option>
+        <option value="A-19">A-19</option>
+        <option value="A-20">A-20</option>
+        <option value="A-21">A-21</option>
+        <option value="A-22">A-22</option>
+        <option value="A-23">A-23</option>
+        <option value="A-24">A-24</option>
+        <option value="A-25">A-25</option>
+        <option value="A-26">A-26</option>
+        <option value="A-27">A-27</option>
+        <option value="A-28">A-28</option>
+        <option value="A-29">A-29</option>
+    </select>
+    <button onclick="generateQRCode()">QR Code Oluştur</button>
+    <div id="qrcode"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.min.js"></script>
+    
+    <script>
+        // QR kodu ayarları
+        const qrCode = new QRCodeStyling({
+            width: 300,
+            height: 300,
+            margin: 10,
+            data: "",
+            dotsOptions: {
+                color: "#000000",
+                type: "rounded"
+            },
+            backgroundOptions: {
+                color: "#ffffff"
+            },
+            imageOptions: {
+                hideBackgroundDots: true,
+                imageSize: 0.2,
+                imageMargin: 0
+            }
+        });
+
+        function generateQRCode() {
+            const selection = document.getElementById("selectionOption").value; // Seçilen değeri al
+            qrCode.update({
+                data: `https://plain-mirage-quark.glitch.me/?id=${selection}`
+            });
+
+            // QR kodunu güncelle
+            const qrcodeDiv = document.getElementById("qrcode");
+            qrcodeDiv.innerHTML = ""; // Önceki QR kodunu temizle
+            qrCode.append(qrcodeDiv); // Yeni QR kodunu ekle
+        }
+    </script>
+</body>
+</html>

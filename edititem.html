@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balık Yönetim Paneli</title>
+    <script type="module" src="edititem.js"></script>
+    <link rel="stylesheet" href="edititem.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .fish-item {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .fish-item button {
+            margin-top: 5px;
+        }
+        .edit-form {
+            display: none;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+        <header class="header">
+        <div class="logo-container">
+            <img src="https://cdn.glitch.global/cb030ad0-deae-4437-8b91-16b6858f29e6/images%20(9).jpeg?v=1733411697012" alt="Logo" class="logo">
+            <h1 class="title">Beykoz - Barbaros Hayrettin Paşa MTAL<br></h1>
+<p style="color: white;">Müzecilik Kulübü Yönetim Alanı</p>
+        </div> <div id="loginContent"><input type="password" id="passwordInput" placeholder="Şifrenizi girin"><button id="loginButton">Giriş</button></div>
+    </header>
+   <div id="secretContent" style="display:none;">
+    <div id="fish-list">
+        <h2>Yükleniyor...</h2>
+    </div>
+    <div id="edit-form-container" class="edit-form">
+        <h3>Ürün Bilgilerini Düzenle</h3>
+        <label for="edit-name">Yeni İsim:</label>
+        <input type="text" id="edit-name">
+        <label for="edit-description-en">Açıklama (EN):</label>
+        <textarea id="edit-description-en"></textarea>
+        <label for="edit-description-tr">Açıklama (TR):</label>
+        <textarea id="edit-description-tr"></textarea>
+        <button onclick="saveEdit()">Kaydet</button>
+        <button onclick="cancelEdit()">İptal</button>
+    </div>
+  </div>
+   <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getDatabase, ref, set, update, get, child, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
+    // Firebase yapılandırma bilgileri
+    const firebaseConfig = {
+        apiKey: "AIzaSyCOK5HGmmS1wmobyNDGQiVFWq4DRvXP04A",
+        authDomain: "bbhpmtalmuze.firebaseapp.com",
+        projectId: "bbhpmtalmuze",
+        storageBucket: "bbhpmtalmuze.firebasestorage.app",
+        messagingSenderId: "703489041966",
+        appId: "1:703489041966:web:657fdf3ea5b0e7421da1bf",
+        measurementId: "G-WVD94QPTNP"
+    };
+
+    // Firebase'i başlat
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+        const loginButton = document.getElementById('loginButton');
+        const passwordInput = document.getElementById('passwordInput');
+        const secretContent = document.getElementById('secretContent');
+
+        // Giriş butonuna tıklama eventi
+        loginButton.addEventListener('click', () => {
+            const passwordRef = ref(database, 'password');
+            
+            onValue(passwordRef, (snapshot) => {
+                // Snapshot'tan değeri al ve türünü kontrol et
+                const correctPassword = snapshot.val();
+
+                // Değerin null veya undefined olup olmadığını kontrol et
+                if (correctPassword === null || correctPassword === undefined) {
+                    alert('Şifre bilgisi alınamadı. Lütfen yöneticiyle iletişime geçin.');
+                    return;
+                }
+
+                // Değeri mutlaka string'e çevir
+                const passwordToCheck = String(correctPassword).trim();
+                const enteredPassword = passwordInput.value.trim();
+
+                if (enteredPassword === passwordToCheck) {
+                    secretContent.style.display = 'block';
+                    loginContent.style.display = 'none';
+                } else {
+                    alert('Yanlış şifre! Lütfen tekrar deneyin.');
+                    secretContent.style.display = 'none';
+                }
+            }, {
+                onlyOnce: true
+            });
+        });
+
+
+  </script>
+</body>
+</html>

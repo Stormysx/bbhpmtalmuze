@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maritime Selections</title>
+  <link rel="stylesheet" href="managepanel.css">
+</head>
+<body>
+      <header class="header">
+        <div class="logo-container">
+            <img src="https://cdn.glitch.global/cb030ad0-deae-4437-8b91-16b6858f29e6/images%20(9).jpeg?v=1733411697012" alt="Logo" class="logo">
+            <h1 class="title">Beykoz - Barbaros Hayrettin Paşa MTAL<br></h1>
+<p style="color: white;">Müzecilik Kulübü Yönetim Alanı</p>
+        </div> <div id="loginContent"><input type="password" id="passwordInput" placeholder="Şifrenizi girin"><button id="loginButton">Giriş</button></div>
+    </header>
+  <center>
+    <div id="secretContent" style="display:none;">  <!-- Display :none-->
+  <!-- Seçim dropdown -->
+  <select id="selectionDropdown" style="display:none;" onchange="loadItems()">
+    <option value="">Seçim Yapın</option>
+    <!-- Seçimler burada dinamik olarak yüklenecek -->
+  </select>
+  
+      
+      
+  <!-- İtem listesi dropdown -->
+  <select id="itemDropdown" style="display:none;" onchange="showItemDetails()">
+    <option value="">Öğeyi Seçin</option>
+  </select>
+
+  <!-- Düzenleme formu -->
+  <div id="editForm" class="edit-form">
+    <h3>Düzenle</h3>
+    <input type="text" id="editName" placeholder="İsim" />
+    <textarea id="editDescription" placeholder="Açıklama"></textarea>
+    <button onclick="saveItem()">Kaydet</button>
+    <button onclick="cancelEdit()">İptal</button>
+  </div>
+
+<h2>Yeni Raf Ekle</h2>
+<div class="add-form">
+  <input type="text" id="newRackName" placeholder="Raf Adı" />
+  <center> <button id="addRackBtn" onclick="addRack(), refreshPage()">Raf Ekle</button> </center>
+</div>
+  
+<!-- Yeni Ürün Ekleme -->
+<h2>Yeni Ürün Ekle</h2>
+<div class="add-form">
+  <select id="rackSelection"> <!-- Burada rackName yerine rackSelection kullanıldı -->
+    <option value="">Raf Seçin</option>
+  </select>
+  <input type="text" id="newItemName" placeholder="Ürün Adı" /> <!-- productName yerine newItemName -->
+  <textarea id="newItemDescriptionTr" placeholder="Türkçe Açıklama"></textarea> <!-- productDetails yerine -->
+  <textarea id="newItemDescriptionEn" placeholder="İngilizce Açıklama"></textarea>
+  <center> <button id="addItemBtn" onclick="addItem()">Ürün Ekle</button> </center> </div>
+      <h2>Ürün Düzenle</h2>
+    <select id="EditSelection">
+      <option value="">Raf Seçin</option> </select>
+    <script>
+// Bölüm Listesi Oluşturma
+        // Raf Listesi Oluşturma
+        const rafList = document.getElementById('EditSelection');
+        const totalSections = 29; // A-1'den A-29'a kadar
+
+        for (let i = 1; i <= totalSections; i++) {
+            const sectionId = `A-${i}`;
+            const option = document.createElement('option');
+            option.value = sectionId;
+            option.textContent = sectionId;
+            rafList.appendChild(option);
+        }
+
+        // Seçim yapılınca yönlendirme
+        rafList.addEventListener('change', function() {
+            const selectedSection = rafList.value;
+            if (selectedSection) {
+                window.location.href = `edititem.html?section=${selectedSection}`; // Yönlendirme
+            }
+        });
+
+    </script>
+</div>
+  <!-- Firebase Script: Modüler versiyon kullanılıyor -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getDatabase, ref, set, update, get, child, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
+    // Firebase yapılandırma bilgileri
+    const firebaseConfig = {
+        apiKey: "AIzaSyCOK5HGmmS1wmobyNDGQiVFWq4DRvXP04A",
+        authDomain: "bbhpmtalmuze.firebaseapp.com",
+        projectId: "bbhpmtalmuze",
+        storageBucket: "bbhpmtalmuze.firebasestorage.app",
+        messagingSenderId: "703489041966",
+        appId: "1:703489041966:web:657fdf3ea5b0e7421da1bf",
+        measurementId: "G-WVD94QPTNP"
+    };
+
+    // Firebase'i başlat
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+    let currentItemKey = null;
+    let currentRackKey = null;
+    let selections = null; // selections değişkenini global olarak tanımla
+
+function loadItems() {
+    const itemDropdown = document.getElementById('itemDropdown');
+    const rackSelection = document.getElementById('rackSelection');
+
+    // Dropdownları temizle
+    itemDropdown.innerHTML = '<option value="">Öğeyi Seçin</option>';
+    rackSelection.innerHTML = '<option value="">Raf Seçin</option>';
+
+    // Firebase'den verileri çekin
+    const selectionsRef = ref(database, 'selections');
+    get(selectionsRef).then((snapshot) => {
+        const selections = snapshot.val();
+        if (selections) {
+            for (const category in selections) {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                document.getElementById('selectionDropdown').appendChild(option); // Yeni kategori dropdown menüsüne ekleyin
+            }
+
+            // İlk seçilen kategoriye bağlı öğeleri yükle
+            const firstSelection = Object.keys(selections)[0];
+            loadItemsForSelection(firstSelection); // İlk seçilen kategoriye bağlı öğeleri yükle
+        } else {
+            alert("Kategori bulunmamaktadır.");
+        }
+    }).catch((error) => {
+        console.error('Veri çekme sırasında hata oluştu:', error);
+    });
+
+    // Rafları sadece ilk yüklemede ekleyin, ikinci kez eklenmesini engelleyin
+    const racksRef = ref(database, 'selections');
+    get(racksRef).then((snapshot) => {
+        const racks = snapshot.val();
+        if (racks) {
+            // Rafları sadece boşsa ekleyin
+            if (rackSelection.childElementCount <= 1) {
+                for (const rackKey in racks) {
+                    const option = document.createElement('option');
+                    option.value = rackKey;
+                    option.textContent = rackKey;
+                    rackSelection.appendChild(option);
+                }
+            }
+        }
+    });
+}
+
+
+
+function loadItemsForSelection(selection) {
+    const itemDropdown = document.getElementById('itemDropdown');
+    const rackSelection = document.getElementById('rackSelection');
+    
+    // Rafları temizle (Tekrardan yüklenmeden önce boşaltıyoruz)
+    rackSelection.innerHTML = '<option value="">Raf Seçin</option>';
+
+    // Öğeleri temizle
+    itemDropdown.innerHTML = '<option value="">Öğeyi Seçin</option>';
+
+    const itemsRef = ref(database, `selections/${selection}`);
+    get(itemsRef).then((snapshot) => {
+        const items = snapshot.val();
+        if (items) {
+            for (const itemKey in items) {
+                const option = document.createElement('option');
+                option.value = itemKey;
+                option.textContent = items[itemKey].name;
+                itemDropdown.appendChild(option);
+            }
+
+            // Rafları da yükle
+            const racksRef = ref(database, 'selections');
+            get(racksRef).then((snapshot) => {
+                const racks = snapshot.val();
+                if (racks) {
+                    for (const rackKey in racks) {
+                        const option = document.createElement('option');
+                        option.value = rackKey;
+                        option.textContent = rackKey;
+                        rackSelection.appendChild(option);
+                    }
+                }
+            });
+        } else {
+            alert("Bu kategoriye ait öğe bulunmamaktadır.");
+        }
+    }).catch((error) => {
+        console.error('Veri çekme sırasında hata oluştu:', error);
+    });
+}
+
+
+// Rafları yeniden yükle
+// Rafları yüklemek ve dinlemek için fonksiyon
+function loadRacks() {
+    const rackSelection = document.getElementById('rackSelection');
+    rackSelection.innerHTML = '<option value="">Raf Seçin</option>'; // Başlangıçta varsayılan seçeneği ekle
+
+    const racksRef = ref(database, 'selections');
+    onValue(racksRef, (snapshot) => { // Firebase verisi değiştiğinde tetiklenir
+        const racks = snapshot.val();
+        if (racks) {
+            // Rafları menüye ekle
+            for (const rackKey in racks) {
+                const option = document.createElement('option');
+                option.value = rackKey;
+                option.textContent = rackKey;
+                rackSelection.appendChild(option);
+            }
+        } else {
+            console.log("Raflar bulunamadı.");
+        }
+    }, (error) => {
+        console.error('Raf verileri dinlenirken hata oluştu:', error);
+    });
+}
+
+
+// Raf ekleme işleminden sonra bu fonksiyonu çağırın
+window.addRack = function () {
+    const newRackName = document.getElementById('newRackName').value;
+
+    if (!newRackName) {
+        alert("Lütfen raf adı girin.");
+        return;
+    }
+
+    const racksRef = ref(database, 'selections/' + newRackName);
+    set(racksRef, {
+        name: newRackName
+    }).then(() => {
+        alert(`Yeni raf "${newRackName}" başarıyla eklendi!`);
+        document.getElementById('newRackName').value = ''; // Giriş kutusunu temizle
+        loadRacks(); // Raflar eklendikten sonra raf seçimini güncelle
+    }).catch((error) => {
+        console.error('Raf eklenirken hata oluştu:', error);
+    });
+};
+
+// Sayfa yüklendikçe rafları yükle
+document.addEventListener("DOMContentLoaded", function () {
+    loadItems();
+    loadRacks(); // Sayfa yüklendikçe rafları da yükle
+});
+
+// Raflar her değiştiğinde öğeleri yükle
+document.getElementById('selectionDropdown').addEventListener('change', function () {
+    loadItems();
+});
+
+
+
+window.addItem = function () {
+    const rackName = document.getElementById('rackSelection').value; // Doğru ID
+    const productName = document.getElementById('newItemName').value; // Doğru ID
+    const productDescriptionTr = document.getElementById('newItemDescriptionTr').value; // Doğru ID
+    const productDescriptionEn = document.getElementById('newItemDescriptionEn').value; // Doğru ID
+
+    if (!rackName || !productName || !productDescriptionTr || !productDescriptionEn) {
+        alert("Lütfen tüm alanları doldurun.");
+        return;
+    }
+
+    const productRef = ref(database, `selections/${rackName}/${productName}`);
+
+    set(productRef, {
+        name: productName,
+        description_tr: productDescriptionTr,
+        description_en: productDescriptionEn
+    }).then(() => {
+        alert(`Ürün "${productName}" başarıyla "${rackName}" rafına eklendi!`);
+        document.getElementById('newItemName').value = '';
+        document.getElementById('newItemDescriptionTr').value = '';
+        document.getElementById('newItemDescriptionEn').value = '';
+    }).catch((error) => {
+        console.error('Ürün eklenirken hata oluştu:', error);
+    });
+};
+
+        const loginButton = document.getElementById('loginButton');
+        const passwordInput = document.getElementById('passwordInput');
+        const secretContent = document.getElementById('secretContent');
+
+        // Giriş butonuna tıklama eventi
+        loginButton.addEventListener('click', () => {
+            const passwordRef = ref(database, 'password');
+            
+            onValue(passwordRef, (snapshot) => {
+                // Snapshot'tan değeri al ve türünü kontrol et
+                const correctPassword = snapshot.val();
+
+                // Değerin null veya undefined olup olmadığını kontrol et
+                if (correctPassword === null || correctPassword === undefined) {
+                    alert('Şifre bilgisi alınamadı. Lütfen yöneticiyle iletişime geçin.');
+                    return;
+                }
+
+                // Değeri mutlaka string'e çevir
+                const passwordToCheck = String(correctPassword).trim();
+                const enteredPassword = passwordInput.value.trim();
+
+                if (enteredPassword === passwordToCheck) {
+                    secretContent.style.display = 'block';
+                    loginContent.style.display = 'none';
+                } else {
+                    alert('Yanlış şifre! Lütfen tekrar deneyin.');
+                    secretContent.style.display = 'none';
+                }
+            }, {
+                onlyOnce: true
+            });
+        });
+    
+
+document.addEventListener("DOMContentLoaded", function () {
+    loadItems();
+});
+
+    window.onload = loadItems;  // Only call loadItems on window load
+
+  </script>
+</body>
+</html>
