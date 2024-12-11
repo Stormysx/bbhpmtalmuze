@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Balık Yönetim Paneli</title>
+    <title>Ürün Yönetim Paneli</title>
     <script type="module" src="edititem.js"></script>
     <link rel="stylesheet" href="edititem.css">
     <style>
@@ -55,7 +55,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
     import { getDatabase, ref, set, update, get, child, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-    // Firebase yapılandırma bilgileri
     const firebaseConfig = {
         apiKey: "AIzaSyCOK5HGmmS1wmobyNDGQiVFWq4DRvXP04A",
         authDomain: "bbhpmtalmuze.firebaseapp.com",
@@ -66,7 +65,6 @@
         measurementId: "G-WVD94QPTNP"
     };
 
-    // Firebase'i başlat
     const app = initializeApp(firebaseConfig);
     const database = getDatabase(app);
 
@@ -74,21 +72,17 @@
         const passwordInput = document.getElementById('passwordInput');
         const secretContent = document.getElementById('secretContent');
 
-        // Giriş butonuna tıklama eventi
         loginButton.addEventListener('click', () => {
             const passwordRef = ref(database, 'password');
             
             onValue(passwordRef, (snapshot) => {
-                // Snapshot'tan değeri al ve türünü kontrol et
                 const correctPassword = snapshot.val();
 
-                // Değerin null veya undefined olup olmadığını kontrol et
                 if (correctPassword === null || correctPassword === undefined) {
                     alert('Şifre bilgisi alınamadı. Lütfen yöneticiyle iletişime geçin.');
                     return;
                 }
 
-                // Değeri mutlaka string'e çevir
                 const passwordToCheck = String(correctPassword).trim();
                 const enteredPassword = passwordInput.value.trim();
 
