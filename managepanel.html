@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Maritime Selections</title>
+  <title>BBHPMTAL - Yönetim Paneli</title>
   <link rel="stylesheet" href="managepanel.css">
 </head>
 <body>
@@ -15,21 +15,21 @@
         </div> <div id="loginContent"><input type="password" id="passwordInput" placeholder="Şifrenizi girin"><button id="loginButton">Giriş</button></div>
     </header>
   <center>
-    <div id="secretContent" style="display:none;">  <!-- Display :none-->
-  <!-- Seçim dropdown -->
+    <div id="secretContent" style="display:none;">  
+ 
   <select id="selectionDropdown" style="display:none;" onchange="loadItems()">
     <option value="">Seçim Yapın</option>
-    <!-- Seçimler burada dinamik olarak yüklenecek -->
+    
   </select>
   
       
       
-  <!-- İtem listesi dropdown -->
+  
   <select id="itemDropdown" style="display:none;" onchange="showItemDetails()">
     <option value="">Öğeyi Seçin</option>
   </select>
 
-  <!-- Düzenleme formu -->
+  
   <div id="editForm" class="edit-form">
     <h3>Düzenle</h3>
     <input type="text" id="editName" placeholder="İsim" />
@@ -44,24 +44,24 @@
   <center> <button id="addRackBtn" onclick="addRack(), refreshPage()">Raf Ekle</button> </center>
 </div>
   
-<!-- Yeni Ürün Ekleme -->
+
 <h2>Yeni Ürün Ekle</h2>
 <div class="add-form">
-  <select id="rackSelection"> <!-- Burada rackName yerine rackSelection kullanıldı -->
+  <select id="rackSelection">
     <option value="">Raf Seçin</option>
   </select>
-  <input type="text" id="newItemName" placeholder="Ürün Adı" /> <!-- productName yerine newItemName -->
-  <textarea id="newItemDescriptionTr" placeholder="Türkçe Açıklama"></textarea> <!-- productDetails yerine -->
+  <input type="text" id="newItemName" placeholder="Ürün Adı" />
+  <textarea id="newItemDescriptionTr" placeholder="Türkçe Açıklama"></textarea>
   <textarea id="newItemDescriptionEn" placeholder="İngilizce Açıklama"></textarea>
   <center> <button id="addItemBtn" onclick="addItem()">Ürün Ekle</button> </center> </div>
       <h2>Ürün Düzenle</h2>
     <select id="EditSelection">
       <option value="">Raf Seçin</option> </select>
     <script>
-// Bölüm Listesi Oluşturma
-        // Raf Listesi Oluşturma
+
+       
         const rafList = document.getElementById('EditSelection');
-        const totalSections = 29; // A-1'den A-29'a kadar
+        const totalSections = 29;
 
         for (let i = 1; i <= totalSections; i++) {
             const sectionId = `A-${i}`;
@@ -71,7 +71,7 @@
             rafList.appendChild(option);
         }
 
-        // Seçim yapılınca yönlendirme
+        
         rafList.addEventListener('change', function() {
             const selectedSection = rafList.value;
             if (selectedSection) {
@@ -81,12 +81,12 @@
 
     </script>
 </div>
-  <!-- Firebase Script: Modüler versiyon kullanılıyor -->
+ 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
     import { getDatabase, ref, set, update, get, child, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-    // Firebase yapılandırma bilgileri
+    
     const firebaseConfig = {
         apiKey: "AIzaSyCOK5HGmmS1wmobyNDGQiVFWq4DRvXP04A",
         authDomain: "bbhpmtalmuze.firebaseapp.com",
@@ -103,17 +103,17 @@
 
     let currentItemKey = null;
     let currentRackKey = null;
-    let selections = null; // selections değişkenini global olarak tanımla
+    let selections = null; 
 
 function loadItems() {
     const itemDropdown = document.getElementById('itemDropdown');
     const rackSelection = document.getElementById('rackSelection');
 
-    // Dropdownları temizle
+    
     itemDropdown.innerHTML = '<option value="">Öğeyi Seçin</option>';
     rackSelection.innerHTML = '<option value="">Raf Seçin</option>';
 
-    // Firebase'den verileri çekin
+   
     const selectionsRef = ref(database, 'selections');
     get(selectionsRef).then((snapshot) => {
         const selections = snapshot.val();
@@ -122,12 +122,12 @@ function loadItems() {
                 const option = document.createElement('option');
                 option.value = category;
                 option.textContent = category;
-                document.getElementById('selectionDropdown').appendChild(option); // Yeni kategori dropdown menüsüne ekleyin
+                document.getElementById('selectionDropdown').appendChild(option); 
             }
 
-            // İlk seçilen kategoriye bağlı öğeleri yükle
+            
             const firstSelection = Object.keys(selections)[0];
-            loadItemsForSelection(firstSelection); // İlk seçilen kategoriye bağlı öğeleri yükle
+            loadItemsForSelection(firstSelection);
         } else {
             alert("Kategori bulunmamaktadır.");
         }
@@ -135,12 +135,12 @@ function loadItems() {
         console.error('Veri çekme sırasında hata oluştu:', error);
     });
 
-    // Rafları sadece ilk yüklemede ekleyin, ikinci kez eklenmesini engelleyin
+   
     const racksRef = ref(database, 'selections');
     get(racksRef).then((snapshot) => {
         const racks = snapshot.val();
         if (racks) {
-            // Rafları sadece boşsa ekleyin
+            
             if (rackSelection.childElementCount <= 1) {
                 for (const rackKey in racks) {
                     const option = document.createElement('option');
@@ -159,10 +159,10 @@ function loadItemsForSelection(selection) {
     const itemDropdown = document.getElementById('itemDropdown');
     const rackSelection = document.getElementById('rackSelection');
     
-    // Rafları temizle (Tekrardan yüklenmeden önce boşaltıyoruz)
+   
     rackSelection.innerHTML = '<option value="">Raf Seçin</option>';
 
-    // Öğeleri temizle
+   
     itemDropdown.innerHTML = '<option value="">Öğeyi Seçin</option>';
 
     const itemsRef = ref(database, `selections/${selection}`);
@@ -176,7 +176,7 @@ function loadItemsForSelection(selection) {
                 itemDropdown.appendChild(option);
             }
 
-            // Rafları da yükle
+           
             const racksRef = ref(database, 'selections');
             get(racksRef).then((snapshot) => {
                 const racks = snapshot.val();
@@ -198,17 +198,16 @@ function loadItemsForSelection(selection) {
 }
 
 
-// Rafları yeniden yükle
-// Rafları yüklemek ve dinlemek için fonksiyon
+
 function loadRacks() {
     const rackSelection = document.getElementById('rackSelection');
-    rackSelection.innerHTML = '<option value="">Raf Seçin</option>'; // Başlangıçta varsayılan seçeneği ekle
+    rackSelection.innerHTML = '<option value="">Raf Seçin</option>'; 
 
     const racksRef = ref(database, 'selections');
-    onValue(racksRef, (snapshot) => { // Firebase verisi değiştiğinde tetiklenir
+    onValue(racksRef, (snapshot) => { 
         const racks = snapshot.val();
         if (racks) {
-            // Rafları menüye ekle
+            
             for (const rackKey in racks) {
                 const option = document.createElement('option');
                 option.value = rackKey;
@@ -224,7 +223,6 @@ function loadRacks() {
 }
 
 
-// Raf ekleme işleminden sonra bu fonksiyonu çağırın
 window.addRack = function () {
     const newRackName = document.getElementById('newRackName').value;
 
@@ -238,20 +236,20 @@ window.addRack = function () {
         name: newRackName
     }).then(() => {
         alert(`Yeni raf "${newRackName}" başarıyla eklendi!`);
-        document.getElementById('newRackName').value = ''; // Giriş kutusunu temizle
-        loadRacks(); // Raflar eklendikten sonra raf seçimini güncelle
+        document.getElementById('newRackName').value = ''; 
+        loadRacks(); 
     }).catch((error) => {
         console.error('Raf eklenirken hata oluştu:', error);
     });
 };
 
-// Sayfa yüklendikçe rafları yükle
+
 document.addEventListener("DOMContentLoaded", function () {
     loadItems();
-    loadRacks(); // Sayfa yüklendikçe rafları da yükle
+    loadRacks();
 });
 
-// Raflar her değiştiğinde öğeleri yükle
+
 document.getElementById('selectionDropdown').addEventListener('change', function () {
     loadItems();
 });
@@ -259,10 +257,10 @@ document.getElementById('selectionDropdown').addEventListener('change', function
 
 
 window.addItem = function () {
-    const rackName = document.getElementById('rackSelection').value; // Doğru ID
-    const productName = document.getElementById('newItemName').value; // Doğru ID
-    const productDescriptionTr = document.getElementById('newItemDescriptionTr').value; // Doğru ID
-    const productDescriptionEn = document.getElementById('newItemDescriptionEn').value; // Doğru ID
+    const rackName = document.getElementById('rackSelection').value; 
+    const productName = document.getElementById('newItemName').value; 
+    const productDescriptionTr = document.getElementById('newItemDescriptionTr').value; 
+    const productDescriptionEn = document.getElementById('newItemDescriptionEn').value; 
 
     if (!rackName || !productName || !productDescriptionTr || !productDescriptionEn) {
         alert("Lütfen tüm alanları doldurun.");
@@ -289,21 +287,21 @@ window.addItem = function () {
         const passwordInput = document.getElementById('passwordInput');
         const secretContent = document.getElementById('secretContent');
 
-        // Giriş butonuna tıklama eventi
+       
         loginButton.addEventListener('click', () => {
             const passwordRef = ref(database, 'password');
             
             onValue(passwordRef, (snapshot) => {
-                // Snapshot'tan değeri al ve türünü kontrol et
+                
                 const correctPassword = snapshot.val();
 
-                // Değerin null veya undefined olup olmadığını kontrol et
+               
                 if (correctPassword === null || correctPassword === undefined) {
                     alert('Şifre bilgisi alınamadı. Lütfen yöneticiyle iletişime geçin.');
                     return;
                 }
 
-                // Değeri mutlaka string'e çevir
+                
                 const passwordToCheck = String(correctPassword).trim();
                 const enteredPassword = passwordInput.value.trim();
 
