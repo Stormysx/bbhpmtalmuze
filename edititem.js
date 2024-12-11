@@ -1,8 +1,6 @@
-// Firebase Modüllerini Yükle
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
 import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
 
-// Firebase Yapılandırması
 const firebaseConfig = {
     apiKey: "AIzaSyCOK5HGmmS1wmobyNDGQiVFWq4DRvXP04A",
     authDomain: "bbhpmtalmuze.firebaseapp.com",
@@ -14,24 +12,20 @@ const firebaseConfig = {
     measurementId: "G-WVD94QPTNP"
 };
 
-// Firebase Başlat
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// DOM Öğesi
 const fishListDiv = document.getElementById("fish-list");
 const editForm = document.getElementById("edit-form-container");
 
-// URL Parametresini Alma
 function getURLParameter(name) {
     return new URLSearchParams(window.location.search).get(name);
 }
 
-// Seçili Rafı Belirleme ve Veriyi Yükleme
 function loadFishData(section = "A-1") {
     const fishRef = ref(db, `selections/${section}`);
     onValue(fishRef, (snapshot) => {
-        fishListDiv.innerHTML = ""; // Eski veriyi temizle
+        fishListDiv.innerHTML = ""; 
         const data = snapshot.val();
         if (data) {
             Object.keys(data).forEach((key) => {
@@ -46,7 +40,6 @@ function loadFishData(section = "A-1") {
                     </div>
                 `;
 
-                // Eğer alt düğümler varsa onları da listele
                 if (fishData.subselections) {
                     const subselectionData = fishData.subselections;
                     Object.keys(subselectionData).forEach((subKey) => {
@@ -69,7 +62,6 @@ function loadFishData(section = "A-1") {
     });
 }
 
-// Balık Bilgilerini Düzenleme
 function editFish(section, key) {
     const fishRef = ref(db, `selections/${section}/${key}`);
     onValue(fishRef, (snapshot) => {
@@ -79,7 +71,6 @@ function editFish(section, key) {
         document.getElementById("edit-description-tr").value = fishData.description_tr;
         editForm.style.display = "block";
 
-        // Kaydetme butonu işlevi
         window.saveEdit = function() {
             const updatedName = document.getElementById("edit-name").value;
             const updatedDescriptionEn = document.getElementById("edit-description-en").value;
@@ -100,14 +91,12 @@ function editFish(section, key) {
             }
         };
 
-        // İptal etme butonu işlevi
         window.cancelEdit = function() {
             editForm.style.display = "none";
         };
     });
 }
 
-// Balık Silme
 function confirmDelete(section, key) {
     if (confirm("Bu ürünü silmek istediğinizden emin misiniz?")) {
         const fishRef = ref(db, `selections/${section}/${key}`);
@@ -120,7 +109,6 @@ function confirmDelete(section, key) {
     }
 }
 
-// Düğmelere Tıklama Etkinlikleri
 fishListDiv.addEventListener("click", (event) => {
     const key = event.target.dataset.key;
     const section = event.target.dataset.section;
@@ -131,9 +119,8 @@ fishListDiv.addEventListener("click", (event) => {
     }
 });
 
-// Sayfa Yüklenirken Veriyi Çek
 window.onload = () => {
-    const sectionFromURL = getURLParameter("section"); // URL'den `section` parametresini al
-    const defaultSection = sectionFromURL || "A-1"; // Eğer URL'de yoksa "A-1" kullan
+    const sectionFromURL = getURLParameter("section"); 
+    const defaultSection = sectionFromURL || "A-1"; 
     loadFishData(defaultSection);
 };
