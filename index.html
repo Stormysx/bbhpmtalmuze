@@ -100,7 +100,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         const shelfId = urlParams.get('id');
 
-        // Sayfa Yüklendiğinde
+        
         document.addEventListener('DOMContentLoaded', () => {
             if (!shelfId) {
                 itemList.innerHTML = '<p>Lütfen bir raf seçiniz. Örnek: ?id=A-1</p>';
@@ -119,7 +119,7 @@
                 const data = snapshot.val();
                 if (data) {
                     Object.keys(data).forEach(key => {
-                        // 'name' özelliğini atla, sadece ürünleri listele
+                        
                         if (key !== 'name') {
                             const item = data[key];
                             const listItem = document.createElement('li');
@@ -142,7 +142,7 @@
         }
 
         function showItemDetails(shelfId, itemKey, itemData) {
-            // Tüm liste öğelerinden seçili öğeyi vurgula
+            
             const allItems = itemListContainer.querySelectorAll('li');
             allItems.forEach(item => item.classList.remove('selected-item'));
             event.target.classList.add('selected-item');
@@ -156,7 +156,7 @@
             vocalizeButton.classList.remove('hidden');
         }
 
-        // Çeviri Butonu
+        
         translateButton.addEventListener('click', () => {
             if (turkishDescription.classList.contains('hidden')) {
                 turkishDescription.classList.remove('hidden');
@@ -167,7 +167,7 @@
             }
         });
 
-        // Seslendirme Butonu
+        
         vocalizeButton.addEventListener('click', () => {
             const text = englishDescription.textContent;
             const utterance = new SpeechSynthesisUtterance(text);
