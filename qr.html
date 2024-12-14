@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BBHPMTAL - QR CODE OLUŞTURUCU</title>
+    <title>BBHPMTAL - QR KOD Yöneticisi</title>
+    <link rel="icon" type="image/x-icon" href="https://i.imgur.com/jSOMfIk.png">
+    <link rel="stylesheet" href="managepanel.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -19,6 +21,10 @@
     </style>
 </head>
 <body>
+    <header class="header">
+        <div class="logo-container">
+            <img src="https://i.imgur.com/jSOMfIk.png" alt="Logo" class="logo">
+            <h1 class="title">BBHPMTAL - QR KOD Yöneticisi</h1></header>
     <select id="selectionOption">
         <option value="A-1">A-1</option>
         <option value="A-2">A-2</option>
@@ -50,7 +56,7 @@
         <option value="A-28">A-28</option>
         <option value="A-29">A-29</option>
     </select>
-    <button onclick="generateQRCode()">QR Code Oluştur</button>
+    <button onclick="generateQRCode()">QR Kod Oluştur!</button>
     <div id="qrcode"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.min.js"></script>
@@ -79,7 +85,7 @@
         function generateQRCode() {
             const selection = document.getElementById("selectionOption").value; // Seçilen değeri al
             qrCode.update({
-                data: `https://bhpre.glitch.me/?id=${selection}`
+                data: `https://bbhpmtalmuze.vercel.app/edititem?section=${selection}`
             });
 
             // QR kodunu güncelle
